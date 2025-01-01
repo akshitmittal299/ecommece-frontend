@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import ProductCard from './components/ProductCard';
 import Login from './components/Login';
 import Signup from './components/Signup';
+import Home from './components/Home';
 import PrivateRoute from './components/PrivateRoute';
 import './App.css';
 
@@ -13,12 +14,13 @@ function App() {
     <Router>
       <div className="flex flex-col min-h-screen">
         <Header />
-        <main className="flex-grow p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <main className="flex-grow p-4 grid place-items-center">
           <Routes>
             {/* Route for Home/Products */}
             <Route 
-              path="/" 
+              path="/products" 
               element={
+                <PrivateRoute>
                 <>
                   <ProductCard 
                     image="https://via.placeholder.com/400x300" 
@@ -41,6 +43,7 @@ function App() {
                     price="59.99" 
                   />
                 </>
+                </PrivateRoute>
               }
             />
 
@@ -49,7 +52,13 @@ function App() {
 
             {/* Route for Signup */}
             <Route path="/signup" element={<Signup />} />
-
+            <Route path="/" element={<Home/>}/>
+            <Route path="/cart" element={
+              <PrivateRoute>
+                <h1>cart page</h1>
+              </PrivateRoute>
+            }
+            />
             {/* Protected Route */}
             <Route 
               path="/profile" 
