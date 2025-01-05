@@ -1,13 +1,17 @@
-// src/context/AuthContext.js
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import {jwtDecode as jwt_decode} from 'jwt-decode';
 
 const AuthContext = createContext();
 
 const isTokenValid = (token) => {
-  const decoded = jwt_decode(token);
-  const now = Date.now() / 1000; // Current time in seconds
-  return decoded.exp > now; // Check if token has expired
+  try {
+    const decoded = jwt_decode(token);
+    const now = Date.now() / 1000; // Current time in seconds
+    return decoded.exp > now; // Check if token has expired
+  } catch (error) {
+    console.error("Invalid token:", error);
+    return false;
+  }
 };
 
 export const AuthProvider = ({ children }) => {
@@ -62,6 +66,9 @@ export const AuthProvider = ({ children }) => {
         setUser(jwt_decode(data.access));
         localStorage.setItem('authTokens', JSON.stringify(data));
       } else {
+        if (response.status === 401) {
+          console.warn("Refresh token expired or invalid.");
+        }
         logout();
       }
     } catch (error) {
@@ -76,19 +83,17 @@ export const AuthProvider = ({ children }) => {
 
       // Schedule token refresh
       const refreshTime = (decoded.exp * 1000) - Date.now() - 60000; // Refresh 1 minute before expiry
-      const refreshInterval = setInterval(() => {
-        refreshTokens();
-      }, refreshTime);
+      const refreshTimeout = setTimeout(refreshTokens, refreshTime);
 
       // Schedule logout when access token expires
       const expiryTime = (decoded.exp * 1000) - Date.now();
-      const logoutTimer = setTimeout(() => {
+      const logoutTimeout = setTimeout(() => {
         logout();
       }, expiryTime);
 
       return () => {
-        clearInterval(refreshInterval);
-        clearTimeout(logoutTimer);
+        clearTimeout(refreshTimeout);
+        clearTimeout(logoutTimeout);
       };
     }
   }, [authTokens, refreshTokens]);

@@ -7,6 +7,9 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import Home from './components/Home';
 import PrivateRoute from './components/PrivateRoute';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
+import ChangePassword from './components/ChangePassword';
 import './App.css';
 
 function App() {
@@ -49,6 +52,8 @@ function App() {
 
             {/* Route for Login */}
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
 
             {/* Route for Signup */}
             <Route path="/signup" element={<Signup />} />
@@ -59,6 +64,10 @@ function App() {
               </PrivateRoute>
             }
             />
+            <Route path="/change-password" element={
+              <PrivateRoute>
+                <ChangePassword/>
+              </PrivateRoute>}/>
             {/* Protected Route */}
             <Route 
               path="/profile" 
